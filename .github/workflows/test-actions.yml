@@ -4,7 +4,7 @@ on:
     branches:
       - part3
 jobs:
-  build-project:
+  part-3:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
@@ -15,5 +15,9 @@ jobs:
         cache: maven
     - name: Build project
       run: mvn clean install -DskipTests -pl byte-buddy-dep -am
+    - name: Run Tests
+      run: mvn -pl byte-buddy-dep test -Dtest=net.bytebuddy.description.type.TypeDescriptionGenericBuilderTest#testGenericTypeInconsistency
+    - name: Run Tests with NonDex for Flaky Test
+      run: mvn -pl byte-buddy-dep edu.illinois:nondex-maven-plugin:2.1.1:nondex -Dtest=net.bytebuddy.description.type.TypeDescriptionGenericBuilderTest#testGenericTypeInconsistency
 
         
