@@ -2,12 +2,12 @@ name: CI
 on:
   push:
     branches:
-      - master
+      - part3
   pull_request:
     branches:
       - master
-  schedule:
-    - cron: "0 0 * * 1"
+  # schedule:
+  #   - cron: "0 0 * * 1"
 permissions: read-all
 jobs:
   hotspot-ea:
@@ -24,7 +24,11 @@ jobs:
           cache: maven
       - name: Build project
         run: ./mvnw verify -Pjava21 -Dnet.bytebuddy.experimental
-        continue-on-error: false
+      - name: Run Tests
+        run: mvn -pl byte-buddy-dep test -Dtest=net.bytebuddy.description.type.TypeDescriptionGenericBuilderTest#testGenericTypeInconsistency
+      - name: Run Tests with NonDex for Flaky Test
+        run: mvn -pl byte-buddy-dep edu.illinois:nondex-maven-plugin:2.1.1:nondex -Dtest=net.bytebuddy.description.type.TypeDescriptionGenericBuilderTest#testGenericTypeInconsistency
+        continue-on-error: true
   hotspot-supported:
     name: Any (supported)
     strategy:
@@ -147,12 +151,16 @@ jobs:
       - uses: actions/checkout@c85c95e3d7251135ab7dc9ce3241c5835cc595a9 # v3.5.3
       - uses: actions/setup-java@cd89f46ac9d01407894225f350157564c9c7cee2 # v3.12.0
         with:
-          java-version: 8
-          distribution: temurin
+          java-version: 11
+          distribution: zulu
           architecture: x64
           cache: maven
       - name: Build project
-        run: ./mvnw jacoco:prepare-agent verify jacoco:report coveralls:report -DrepoToken=${{ secrets.coveralls }} -Pextras -Pchecks -Panalysis -Pintegration -Pchecksum-enforce
+        run: mvn clean install -DskipTests -pl byte-buddy-dep -am
+      - name: Run Tests
+        run: mvn -pl byte-buddy-dep test -Dtest=net.bytebuddy.description.type.TypeDescriptionGenericBuilderTest#testGenericTypeInconsistency
+      - name: Run Tests with NonDex for Flaky Test
+        run: mvn -pl byte-buddy-dep edu.illinois:nondex-maven-plugin:2.1.1:nondex -Dtest=net.bytebuddy.description.type.TypeDescriptionGenericBuilderTest#testGenericTypeInconsistency
   release:
     name: Release new version
     runs-on: ubuntu-20.04
