@@ -1268,7 +1268,7 @@ public abstract class AbstractTypeDescriptionGenericTest {
         assertThat(typeDescription.getDeclaredMethods().filter(named(FOO)).getOnly().getExceptionTypes().size(), is(2));
         assertThat(typeDescription.getDeclaredMethods().filter(named(FOO)).getOnly().getExceptionTypes().get(0).getSort(),
                 is(TypeDescription.Generic.Sort.NON_GENERIC));
-        assertThat(typeDescription.getDeclaredMethods().filter(named(FOO)).getOnly().getExceptionTypes().get(0).asErasure().represents(Exception.class),
+        assertThat(typeDescription.getDeclaredMethods().filter(named(FOO)).getOnly().getExceptionTypes().get(1).asErasure().represents(Exception.class),
                 is(true));
         assertThat(typeDescription.getDeclaredMethods().filter(named(FOO)).getOnly().getExceptionTypes().get(1).getSort(),
                 is(TypeDescription.Generic.Sort.NON_GENERIC));
